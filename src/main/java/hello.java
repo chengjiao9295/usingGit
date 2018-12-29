@@ -5,8 +5,9 @@ public class hello {
         System.out.print("bbbbb");
         System.out.print("ccccc");
         System.out.print("ddddd");
-        System.out.print("eeeewww");
-        //
+        System.out.print("eee");
+        System.out.print("practice git add");
+        //git add src/main/java/hello.java
         //ddddddddddd
         //sssss
     }

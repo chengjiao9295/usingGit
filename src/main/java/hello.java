@@ -10,5 +10,6 @@ public class hello {
         //git add src/main/java/hello.java
         //ddddddddddd
         //sssss
+        System.out.print("merge into master;now the branch is on the newBran");
     }
 }

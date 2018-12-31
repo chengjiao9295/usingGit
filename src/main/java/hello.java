@@ -13,6 +13,7 @@ public class hello {
         System.out.print("merge into master;now the branch is on the newBran");
         System.out.print("given that someone else hava commited a new code before you commit");
         System.out.print("you also modified the code");
-         System.out.print("given that someone else hava commited a new code before you commit");
+        System.out.print("given that someone else hava commited a new code before you commit");
+        System.out.print("given that someone else hava commited a new code before you commit");
     }
 }

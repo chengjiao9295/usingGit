@@ -180,6 +180,7 @@ public class exportExcelDemo {
         Font font = workbook.createFont();
         font.setFontHeightInPoints((short) 15);
         font.setBold(true);
+        font.setItalic(true);
         style.setFont(font);
 
         style.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -193,11 +194,17 @@ public class exportExcelDemo {
         Cell cell1= row_1.createCell(0,CellType.STRING);
         SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
         cell1.setCellValue("制作时间："+fmt.format(new Date()));
+        Font font11 = workbook.createFont();
+        font11.setItalic(true);
+        CellStyle style11 = workbook.createCellStyle();
+        style11.setFont(font11);
+        cell1.setCellStyle(style11);
         sheet.addMergedRegion(new CellRangeAddress(1,1,0,12));
 
         /*初始化head，填值标题行（第一行）*/
         Row row0 = sheet.createRow(2);
         CellStyle cell2=workbook.createCellStyle();
+        cell2.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         cell2.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
         cell2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         for(int i = 0; i<title.length; i++){

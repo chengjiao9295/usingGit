@@ -1,61 +1,30 @@
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
-
-//fundsMgmtBankParternerCPExtMapper.java
-
-//List<FundsMgmtBankPartnerCPVOExt> queryRelatedData(String bankId);
-//
-////fundsMgmtBankParternerCPExtMapper.xml
-//
-//        <select id="queryRelatedData"
-//        resultMap="com.orientsec.cleam.bean.ext.FundsMgmtBankPartnerCPVOExt"
-//        parameterType="java.lang.String">
-//        SELECT
-//        cp.bankName, cp.contactor, cp.telephone,cp.address,cp.faxNum,cp.zipCode,
-//        creditLimit.maxLimit as bankMaxLimit, creditLimit.startDate, creditLimit.endDate,
-//        category.categoryName, category.maxLimit as categoryMaxLimit,
-//        map.trdType, map.creditRate
-//        from FundsMgmtBankPartnerCP cp left join
-//        FundsMgmtBankCreditLimit creditLimit on cp.id = creditLimit.bankId
-//        left join FundsMgmtBankCreditCategory category on creditLimit.id=category.bankCrdId
-//        LEFT join FundsMgmtTradeCreditMap map on category.id = map.cateId
-//        <trim prefix="WHERE" prefixOverrides="AND">
-//        <if test="bankId != null and bankId!='' ">
-//        AND cp.bankId=#{bankId, jdbcType=VARCHAR}
-//        </if>
-//        </trim>
-//        order By cp.id DESC
-//        </select>
 
 
 public class exportExcelDemo {
     public <T> void exportExcel()throws SecurityException, IllegalArgumentException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException {
-//        String bankId = param.getId();
-//        if(StringUtils.isBlank(bankId)){
-//            LoggerUtil.info("导出所有银行配置信息");
-//        }else{
-//            this.convertBankId(param) ;
-//        }
-//        bankId = param.getBankId();
-//        FundsMgmtBankPartnerCPExtMapper extMapper = sqlSession.getMapper(FundsMgmtBankPartnerCPExtMapper.class);
-//        List<FundsMgmtBankPartnerCPVOExt> dataSource= extMapper.queryRelatedData(bankId);
+
         String[] title = new String[]{"银行名称","联系人","电话","地址","传真号码","邮编","银行额度",
-        "开始日期","结束日期","分类别名","授信额度","交易类型","折算率"};
+                "开始日期","结束日期","分类别名","授信额度","交易类型","折算率"};
         String colName[] = new String[]{"bankName","contactor","telephone","address","faxNum",
-        "zipCode","bankMaxLimit","startDate","endDate","categoryName","categoryMaxLimit",
-        "trdType","creditRate"};
+                "zipCode","bankMaxLimit","startDate","endDate","categoryName","categoryMaxLimit",
+                "trdType","creditRate"};
         int[] mergeIndex ={0,9};//0:0-8;9:9-10
         Map<String, String> range = new HashMap<>();
         range.put("0","0-8");
@@ -182,8 +151,6 @@ public class exportExcelDemo {
         vo.setTrdType(1);
         vo.setCreditRate(new BigDecimal("1400"));
         list.add(vo);
-
-        invokeMethod(vo,colName[1],null);
         createExcel(title, colName,list, mergeIndex, range);
         List<T> beanList = new ArrayList<T>();
     }
@@ -205,38 +172,68 @@ public class exportExcelDemo {
         }catch (Exception e){
             e.printStackTrace();
         }
+        /**/
+        Row row_0 = sheet.createRow(0);
+        Cell cell0= row_0.createCell(0,CellType.STRING);
+        cell0.setCellValue("授信银行基本信息");
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) 15);
+        font.setBold(true);
+        style.setFont(font);
+
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+        style.setAlignment(HorizontalAlignment.CENTER);
+
+
+        row_0.setHeightInPoints((float) 20);
+        sheet.addMergedRegion(new CellRangeAddress(0,0,0,12));
+        cell0.setCellStyle(style);
+        Row row_1= sheet.createRow(1);
+        Cell cell1= row_1.createCell(0,CellType.STRING);
+        SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+        cell1.setCellValue("制作时间："+fmt.format(new Date()));
+        sheet.addMergedRegion(new CellRangeAddress(1,1,0,12));
+
         /*初始化head，填值标题行（第一行）*/
-        Row row0 = sheet.createRow(0);
+        Row row0 = sheet.createRow(2);
+        CellStyle cell2=workbook.createCellStyle();
+        cell2.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        cell2.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         for(int i = 0; i<title.length; i++){
             /*创建单元格，指定类型*/
             Cell cell_1 = row0.createCell(i, CellType.STRING);
             cell_1.setCellValue(title[i]);
+            cell_1.setCellStyle(cell2);
+
         }
         /*遍历该数据集合*/
         List<PoiModel> poiModels=new ArrayList<>();
         if(null!=workbook) {
 
-            int index = 1;/*这里1是从excel的第二行开始，第一行已经塞入标题了*/
+            int index = 3;/*这里1是从excel的第二行开始，第一行已经塞入标题了*/
             for (T vo : list) {
+
 
                 Row row = sheet.createRow(index);
                 Boolean flag = false;
                 for(int i =0; i< title.length; i++){
                     //判断合并区域
 
-                    if(index == 1){
+                    if(index == 3){
                         PoiModel poiModel = new PoiModel();
                         poiModel.setOldContent(getFiled(vo, colName[i]));
                         poiModel.setContent(getFiled(vo, colName[i]));
-                        poiModel.setRowIndex(1);
+                        poiModel.setRowIndex(3);
                         poiModel.setCellIndex(i);
                         poiModels.add(poiModel);
 
                     }
                     String oldContent = "";
-                    if (index > 1) {
+                    if (index > 3) {
                         oldContent = poiModels.get(i) == null ? "" : poiModels.get(i).getContent();
                     }
+
                     if(i ==0 && !poiModels.get(0).getContent().equals(getFiled(vo,colName[0]))){
                          /*当前行的当前列与上一行的当前列的内容不一致时，则把当前行以上的合并*/
                         int firstRowIndex = poiModels.get(0).getRowIndex();
@@ -260,18 +257,18 @@ public class exportExcelDemo {
 //                        if((i==9 && !poiModels.get(9).getContent().equals(getFiled(vo,colName[9])) &&
 //                                poiModels.get(0).getContent().equals(getFiled(vo,colName[0])))){
                            /*当前行的当前列与上一行的当前列的内容不一致时，则把当前行以上的合并*/
-                            int firstRowIndex = poiModels.get(9).getRowIndex();
-                            int lastRowIndex = index -1;
-                            int colIndex = poiModels.get(9).getCellIndex();
-                            //在sheet里增加合并单元格
-                            if(firstRowIndex != lastRowIndex){
-                                sheet = setMergedRegion(firstRowIndex, lastRowIndex, colIndex, i, sheet, range);
-                            }
+                        int firstRowIndex = poiModels.get(9).getRowIndex();
+                        int lastRowIndex = index -1;
+                        int colIndex = poiModels.get(9).getCellIndex();
+                        //在sheet里增加合并单元格
+                        if(firstRowIndex != lastRowIndex){
+                            sheet = setMergedRegion(firstRowIndex, lastRowIndex, colIndex, i, sheet, range);
+                        }
                         /*重新记录该列的内容为当前内容，行标记改为当前行标记，列标记则为当前列*/
-                            poiModels.get(i).setContent(getFiled(vo, colName[i]));
-                            poiModels.get(i).setRowIndex(index);
-                            poiModels.get(i).setCellIndex(i);
-                       /// }
+                        poiModels.get(i).setContent(getFiled(vo, colName[i]));
+                        poiModels.get(i).setRowIndex(index);
+                        poiModels.get(i).setCellIndex(i);
+                        /// }
 
                     }
                     if(flag && i==9 && poiModels.get(9).getContent().equals(getFiled(vo,colName[9]))){
@@ -287,7 +284,7 @@ public class exportExcelDemo {
                         poiModels.get(i).setRowIndex(index);
                         poiModels.get(i).setCellIndex(i);
                     }
-                    if((i==0 || i==9) && index==list.size()){
+                    if((i==0 || i==9) && index-3==list.size()){
                         int firstRowIndex = poiModels.get(i).getRowIndex();
                         int lastRowIndex = index;
                         int colIndex = poiModels.get(i).getCellIndex();
@@ -356,20 +353,32 @@ public class exportExcelDemo {
 
     public String getFiled(Object object, String field) {
         Class<? extends Object> clazz  = object.getClass();
-        Field[] fields=clazz.getFields();
-        PropertyDescriptor pd = null;
+//        PropertyDescriptor pd = null;
+//        Method getMethod = null;
+//        try {
+//            pd = new PropertyDescriptor(field, clazz);
+//            if (null != pd) {
+//                // 获取  这个 field 属性 的get方法
+//                getMethod = pd.getReadMethod();
+//                Object invoke = getMethod.invoke(object);
+//                if(invoke==null) {
+//                    invoke = "";
+//                }
+//                return invoke.toString();
+//            }
+
+
         Method getMethod = null;
         try {
-            pd = new PropertyDescriptor(field, clazz);
-            if (null != pd) {
-                // 获取  这个 field 属性 的get方法
-                getMethod = pd.getReadMethod();
-                Object invoke = getMethod.invoke(object);
-                if(invoke==null) {
-                    invoke = "";
-                }
-                return invoke.toString();
+            getMethod = clazz.getMethod(toGetter(field));
+
+            // 获取  这个 field 属性 的get方法
+
+            Object invoke = getMethod.invoke(object);
+            if(invoke==null) {
+                invoke = "";
             }
+            return invoke.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -410,8 +419,8 @@ public class exportExcelDemo {
         return  fieldname;
     }
     public static void main (String[] args) throws SecurityException, IllegalArgumentException, NoSuchMethodException,
-    IllegalAccessException, InvocationTargetException {
-       exportExcelDemo demo = new exportExcelDemo();
-       demo.exportExcel();
+            IllegalAccessException, InvocationTargetException {
+        exportExcelDemo demo = new exportExcelDemo();
+        demo.exportExcel();
     }
 }

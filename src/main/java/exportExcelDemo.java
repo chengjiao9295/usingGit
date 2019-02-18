@@ -155,7 +155,7 @@ public class exportExcelDemo {
         List<T> beanList = new ArrayList<T>();
     }
 
-    public <T> String createExcel(String[] title, String[] colName, List<T> list, int[] mergeIndex, Map<String, String> range){
+    public <T extends Map<String, Object>> String createExcel(String[] title, String[] colName, List<T> list, int[] mergeIndex, Map<String, String> range){
 
         if (title.length==0){
             return null;
@@ -220,8 +220,7 @@ public class exportExcelDemo {
 
             int index = 3;/*这里1是从excel的第二行开始，第一行已经塞入标题了*/
             for (T vo : list) {
-
-
+                vo.size();
                 Row row = sheet.createRow(index);
                 Boolean flag = false;
                 for(int i =0; i< title.length; i++){

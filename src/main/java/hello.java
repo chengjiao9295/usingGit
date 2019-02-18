@@ -33,11 +33,11 @@ public class hello {
     public String addReportByExcel()
             throws IOException {
         String message = "Import success";
-//
-//        boolean isE2007 = false;    //判断是否是excel2007格式
-//        if(fileName.endsWith("xlsx")){
-//            isE2007 = true;
-//        }
+
+        boolean isE2007 = false;    //判断是否是excel2007格式
+        if("ss.xlsx".endsWith("xlsx")){
+            isE2007 = true;
+        }
         return message;
     }
 
